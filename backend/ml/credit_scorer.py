@@ -362,16 +362,30 @@ class CreditScorer:
         factors_helping = []
         factors_hurting = []
         
+        # Flatten shap_values if needed (handle both 1D and 2D arrays)
+        if len(shap_values.shape) > 1:
+            shap_values_flat = shap_values[0]  # Take first row if 2D
+        else:
+            shap_values_flat = shap_values
+        
         for feature, impact in sorted_features[:10]:
-            impact_value = shap_values[self.feature_names.index(feature)] if feature in self.feature_names else 0
+            if feature in self.feature_names:
+                feature_idx = self.feature_names.index(feature)
+                if feature_idx < len(shap_values_flat):
+                    impact_value = float(shap_values_flat[feature_idx])
+                else:
+                    impact_value = 0.0
+            else:
+                impact_value = 0.0
+            
             feature_display = feature.replace('_', ' ').title()
             
-            if impact_value > 0:
+            if impact_value > 0.01:  # Small threshold to avoid noise
                 factors_helping.append({
                     'factor': feature_display,
                     'impact': f"+{int(impact_value * 100)} points"
                 })
-            elif impact_value < 0:
+            elif impact_value < -0.01:
                 factors_hurting.append({
                     'factor': feature_display,
                     'impact': f"{int(impact_value * 100)} points"
