@@ -107,10 +107,17 @@ class CreditScorer:
             X, y, test_size=test_size, stratify=y, random_state=42
         )
         
-        # Handle class imbalance with SMOTE
-        print("⚖️  Applying SMOTE for class balance...")
-        smote = SMOTE(sampling_strategy=0.7, random_state=42)
-        X_train_balanced, y_train_balanced = smote.fit_resample(X_train, y_train)
+        # Handle class imbalance with SMOTE (if needed)
+        class_counts = y_train.value_counts()
+        minority_ratio = class_counts.min() / class_counts.max()
+        
+        if minority_ratio < 0.5:
+            print(f"⚖️  Applying SMOTE for class balance (ratio: {minority_ratio:.2f})...")
+            smote = SMOTE(sampling_strategy=0.8, random_state=42)
+            X_train_balanced, y_train_balanced = smote.fit_resample(X_train, y_train)
+        else:
+            print(f"✅ Classes already balanced (ratio: {minority_ratio:.2f}), skipping SMOTE")
+            X_train_balanced, y_train_balanced = X_train, y_train
         
         # 1. XGBoost
         print("🌳 Training XGBoost...")
