@@ -309,6 +309,78 @@ class CreditScorer:
         
         return recommendations[:5]  # Top 5 recommendations
     
+    def predict_with_explanation(self, credit_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Predict credit score with full SHAP explanation and recommendations
+        
+        Args:
+            credit_data: Dictionary with credit features
+        
+        Returns:
+            Complete analysis with score, confidence, risk level, SHAP values, recommendations
+        """
+        # Prepare features
+        feature_values = []
+        for feature in self.feature_names:
+            feature_values.append(credit_data.get(feature, 0))
+        
+        X = pd.DataFrame([feature_values], columns=self.feature_names)
+        
+        # Get prediction
+        scores, proba = self.predict(X)
+        credit_score = int(scores[0])
+        confidence = float(proba[0])
+        
+        # Determine risk level
+        if credit_score >= 740:
+            risk_level = 'LOW'
+        elif credit_score >= 670:
+            risk_level = 'MEDIUM'
+        elif credit_score >= 580:
+            risk_level = 'HIGH'
+        else:
+            risk_level = 'CRITICAL'
+        
+        # Generate SHAP explanations
+        explanation = self.explain(X)
+        
+        # Generate recommendations
+        shap_values = np.array(explanation['shap_values'])
+        recommendations = self.generate_recommendations(X, shap_values)
+        
+        # Get top positive and negative factors
+        feature_importance = explanation['feature_importance']
+        sorted_features = sorted(feature_importance.items(), key=lambda x: abs(x[1]), reverse=True)
+        
+        factors_helping = []
+        factors_hurting = []
+        
+        for feature, impact in sorted_features[:10]:
+            impact_value = shap_values[self.feature_names.index(feature)] if feature in self.feature_names else 0
+            feature_display = feature.replace('_', ' ').title()
+            
+            if impact_value > 0:
+                factors_helping.append({
+                    'factor': feature_display,
+                    'impact': f"+{int(impact_value * 100)} points"
+                })
+            elif impact_value < 0:
+                factors_hurting.append({
+                    'factor': feature_display,
+                    'impact': f"{int(impact_value * 100)} points"
+                })
+        
+        return {
+            'credit_score': credit_score,
+            'confidence': confidence,
+            'risk_level': risk_level,
+            'feature_importance': feature_importance,
+            'shap_values': explanation.get('shap_values', []),
+            'recommendations': recommendations,
+            'factors_helping': factors_helping[:5],
+            'factors_hurting': factors_hurting[:5]
+        }
+    
     def _proba_to_credit_score(self, proba: np.ndarray) -> np.ndarray:
         """
         Convert probability to FICO-style credit score (300-850)
