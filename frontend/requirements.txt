@@ -1,0 +1,23 @@
+# Streamlit Dashboard
+streamlit==1.29.0
+streamlit-option-menu==0.3.12
+
+# Data Visualization
+plotly==5.18.0
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Data Processing
+pandas==2.1.4
+numpy==1.26.2
+
+# HTTP Client
+requests==2.31.0
+httpx==0.25.2
+
+# Authentication
+pyjwt==2.8.0
+
+# Utilities
+python-dotenv==1.0.0
+python-dateutil==2.8.2
