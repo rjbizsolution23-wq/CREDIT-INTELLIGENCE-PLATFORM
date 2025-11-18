@@ -3,10 +3,11 @@ Credit Analysis Routes
 AI-powered credit scoring, fraud detection, and forecasting
 """
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 import sys
 from pathlib import Path
 from datetime import datetime
+import os
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -17,12 +18,63 @@ from api.schemas import (
     SuccessResponse
 )
 from api.routes.auth import get_current_user
+from ml.credit_scorer import CreditScorer
+from ml.fraud_detector import FraudDetector
+from ml.forecaster import CreditScoreForecaster
+from services.openrouter_service import OpenRouterService
 
 router = APIRouter()
 
+# Initialize ML models (singleton pattern)
+_credit_scorer: Optional[CreditScorer] = None
+_fraud_detector: Optional[FraudDetector] = None
+_forecaster: Optional[CreditScoreForecaster] = None
+_openrouter: Optional[OpenRouterService] = None
 
-# Mock ML model predictions for now
-# TODO: Replace with actual ML model inference
+
+def get_credit_scorer() -> CreditScorer:
+    """Lazy-load credit scorer model"""
+    global _credit_scorer
+    if _credit_scorer is None:
+        model_path = os.path.join(Path(__file__).parent.parent.parent, 'ml', 'models', 'credit_scorer.pkl')
+        if os.path.exists(model_path):
+            _credit_scorer = CreditScorer(model_path=model_path)
+        else:
+            _credit_scorer = CreditScorer()
+            # TODO: Train on initial synthetic data if no model exists
+    return _credit_scorer
+
+
+def get_fraud_detector() -> FraudDetector:
+    """Lazy-load fraud detector model"""
+    global _fraud_detector
+    if _fraud_detector is None:
+        model_path = os.path.join(Path(__file__).parent.parent.parent, 'ml', 'models', 'fraud_detector.pkl')
+        if os.path.exists(model_path):
+            _fraud_detector = FraudDetector(model_path=model_path)
+        else:
+            _fraud_detector = FraudDetector()
+    return _fraud_detector
+
+
+def get_forecaster() -> CreditScoreForecaster:
+    """Lazy-load forecaster model"""
+    global _forecaster
+    if _forecaster is None:
+        model_path = os.path.join(Path(__file__).parent.parent.parent, 'ml', 'models', 'forecaster.pkl')
+        if os.path.exists(model_path):
+            _forecaster = CreditScoreForecaster(model_path=model_path)
+        else:
+            _forecaster = CreditScoreForecaster()
+    return _forecaster
+
+
+def get_openrouter() -> OpenRouterService:
+    """Lazy-load OpenRouter service"""
+    global _openrouter
+    if _openrouter is None:
+        _openrouter = OpenRouterService()
+    return _openrouter
 
 
 def mock_credit_score_analysis(report_id: str) -> Dict[str, Any]:
@@ -122,14 +174,54 @@ async def analyze_credit_score(
     - Actionable recommendations
     - Factors helping/hurting score
     """
-    # TODO: Load report from database
-    # TODO: Run actual ML model inference
-    # TODO: Generate SHAP explanations
-    # TODO: Cache results in Redis
-    
-    analysis = mock_credit_score_analysis(request.report_id)
-    
-    return CreditScoreResponse(**analysis)
+    try:
+        # TODO: Load actual report from database using report_id
+        # For now, use mock credit data
+        credit_data = {
+            'late_payments_12mo': 2,
+            'credit_utilization_ratio': 0.35,
+            'oldest_account_age_months': 180,
+            'total_accounts': 12,
+            'hard_inquiries_6mo': 11,
+            'collections_count': 26,
+            'derogatory_marks': 3,
+            'total_balance': 33000,
+            'total_credit_limit': 95000,
+            'on_time_payment_rate': 0.85,
+            'avg_account_age_months': 90
+        }
+        
+        # Get ML model and run prediction
+        scorer = get_credit_scorer()
+        result = scorer.predict_with_explanation(credit_data)
+        
+        # Get AI insights from OpenRouter (free tier)
+        openrouter = get_openrouter()
+        ai_insights = await openrouter.generate_credit_insights(credit_data, "quick")
+        
+        # Format response
+        analysis = {
+            "score": result['credit_score'],
+            "confidence": result['confidence'],
+            "risk_level": result['risk_level'],
+            "shap_values": result['feature_importance'],
+            "recommendations": result['recommendations'],
+            "factors_helping": result.get('factors_helping', []),
+            "factors_hurting": result.get('factors_hurting', []),
+            "ai_insights": ai_insights[:300],  # Summary
+            "created_at": datetime.utcnow()
+        }
+        
+        # TODO: Cache results in Redis
+        # TODO: Save analysis to database
+        
+        return CreditScoreResponse(**analysis)
+        
+    except Exception as e:
+        # Fallback to mock data if ML fails
+        print(f"ML prediction failed: {e}, falling back to mock")
+        analysis = mock_credit_score_analysis(request.report_id)
+        return CreditScoreResponse(**analysis)
 
 
 @router.post("/fraud-check", response_model=FraudCheckResponse)
@@ -155,13 +247,54 @@ async def check_fraud(
     - Anomaly descriptions
     - Confidence level
     """
-    # TODO: Build transaction graph from credit data
-    # TODO: Run GNN fraud detection model
-    # TODO: Flag suspicious patterns
-    
-    fraud_analysis = mock_fraud_detection(request.report_id)
-    
-    return FraudCheckResponse(**fraud_analysis)
+    try:
+        # TODO: Load actual report from database using report_id
+        # For now, use mock credit data
+        credit_data = {
+            'user_id': current_user.get('email'),
+            'inquiries_6mo': 11,
+            'new_accounts_12mo': 6,
+            'credit_utilization': 0.35,
+            'late_payments_12mo': 2,
+            'address_changes_12mo': 1,
+            'collections_count': 26,
+            'total_accounts': 12,
+            'revolving_accounts': 8,
+            'derogatory_marks': 3
+        }
+        
+        # Get ML model and run fraud detection
+        detector = get_fraud_detector()
+        fraud_alert = detector.predict(credit_data)
+        
+        # Format response
+        fraud_analysis = {
+            "risk_score": int(fraud_alert.fraud_probability * 100),
+            "is_fraudulent": fraud_alert.risk_level in ['high', 'critical'],
+            "risk_level": fraud_alert.risk_level,
+            "flagged_items": [
+                {
+                    "type": indicator['type'],
+                    "severity": indicator['severity'],
+                    "description": indicator['description']
+                }
+                for indicator in fraud_alert.fraud_indicators
+            ],
+            "anomalies": fraud_alert.graph_anomalies,
+            "recommended_actions": fraud_alert.recommended_actions,
+            "confidence": fraud_alert.confidence_score,
+            "created_at": datetime.utcnow()
+        }
+        
+        # TODO: Save fraud alert to database if high risk
+        # TODO: Trigger notifications if critical
+        
+        return FraudCheckResponse(**fraud_analysis)
+        
+    except Exception as e:
+        print(f"Fraud detection failed: {e}, falling back to mock")
+        fraud_analysis = mock_fraud_detection(request.report_id)
+        return FraudCheckResponse(**fraud_analysis)
 
 
 @router.post("/forecast", response_model=CreditForecastResponse)
@@ -184,14 +317,75 @@ async def forecast_credit_score(
     - Confidence intervals
     - Scenario-based recommendations
     """
-    # TODO: Extract time-series features from credit history
-    # TODO: Run forecasting model
-    # TODO: Generate confidence intervals
-    # TODO: Provide scenario analysis
-    
-    forecast = mock_credit_forecast(request.report_id, request.months_ahead)
-    
-    return CreditForecastResponse(**forecast)
+    try:
+        # TODO: Load actual credit history from database
+        # For now, use mock credit data
+        credit_data = {
+            'credit_score': 704,
+            'credit_utilization': 0.35,
+            'late_payments_12mo': 2,
+            'inquiries_6mo': 11,
+            'collections_count': 26,
+            'derogatory_marks': 3,
+            'total_accounts': 12,
+            'oldest_account_age_months': 180,
+            'avg_account_age_months': 90,
+            'total_balance': 33000,
+            'total_credit_limit': 95000,
+            'monthly_income': 7500
+        }
+        
+        # Get ML model and generate forecast
+        forecaster = get_forecaster()
+        forecast_result = forecaster.forecast(credit_data, months_ahead=request.months_ahead)
+        
+        # Format predictions for API response
+        predictions = [
+            {
+                "month": i + 1,
+                "score": score,
+                "confidence": max(0.85 - (i * 0.03), 0.65),
+                "month_date": month_str
+            }
+            for i, (score, month_str) in enumerate(
+                zip(forecast_result.forecasted_scores, forecast_result.forecast_months)
+            )
+        ]
+        
+        # Format confidence intervals
+        confidence_intervals = [
+            {
+                "month": i + 1,
+                "lower": lower,
+                "upper": upper
+            }
+            for i, (lower, upper) in enumerate(forecast_result.confidence_intervals)
+        ]
+        
+        # Get AI-powered financial advice
+        openrouter = get_openrouter()
+        financial_advice = await openrouter.generate_financial_advice(credit_data, "improve_score")
+        
+        forecast = {
+            "current_score": forecast_result.current_score,
+            "predicted_scores": predictions,
+            "confidence_intervals": confidence_intervals,
+            "trend": forecast_result.trend,
+            "key_drivers": forecast_result.key_drivers,
+            "milestone_dates": forecast_result.milestone_dates,
+            "recommendations": forecast_result.recommendations,
+            "ai_advice": financial_advice[:500],  # Summary
+            "created_at": datetime.utcnow()
+        }
+        
+        # TODO: Save forecast to database
+        
+        return CreditForecastResponse(**forecast)
+        
+    except Exception as e:
+        print(f"Forecasting failed: {e}, falling back to mock")
+        forecast = mock_credit_forecast(request.report_id, request.months_ahead)
+        return CreditForecastResponse(**forecast)
 
 
 @router.get("/history/{user_id}", response_model=SuccessResponse)
