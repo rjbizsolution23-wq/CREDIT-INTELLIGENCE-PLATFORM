@@ -14,10 +14,21 @@ class UserRole(str, Enum):
     SUPER_ADMIN = "super_admin"
 
 
+class Address(BaseModel):
+    street: str
+    city: str
+    state: str
+    zip: str
+
+
 class UserRegister(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8)
     full_name: str = Field(..., min_length=2)
+    phone: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    address: Optional[Address] = None
+    ssn_last4: Optional[str] = None
     affiliate_id: Optional[str] = None
 
 

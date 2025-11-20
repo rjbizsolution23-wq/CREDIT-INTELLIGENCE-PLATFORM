@@ -26,8 +26,11 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_PREFIX}/auth/login
 
 
 def hash_password(password: str) -> str:
-    """Hash a password"""
-    return pwd_context.hash(password)
+    """Hash a password (truncate to 72 chars for bcrypt compatibility)"""
+    # Bcrypt has a max password length of 72 bytes
+    # Truncate password to 72 characters to avoid errors
+    truncated_password = password[:72] if len(password) > 72 else password
+    return pwd_context.hash(truncated_password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -80,7 +83,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
         raise credentials_exception
 
 
-@router.post("/register", response_model=SuccessResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register")
 async def register(user: UserRegister):
     """
     Register a new user
@@ -88,31 +91,50 @@ async def register(user: UserRegister):
     - **email**: Valid email address
     - **password**: Minimum 8 characters
     - **full_name**: User's full name
-    - **affiliate_id**: Optional affiliate tracking ID
+    - **phone**: Phone number
+    - **date_of_birth**: Date of birth
+    - **address**: Full address object
+    - **ssn_last4**: Last 4 digits of SSN
     """
     # TODO: Check if user already exists in database
     # TODO: Save user to database
     
-    # For now, return mock response
+    # For now, return mock response with tokens
     hashed_pwd = hash_password(user.password)
     
-    return SuccessResponse(
-        success=True,
-        message="User registered successfully",
-        data={
-            "user_id": "mock-user-id-123",
-            "email": user.email,
-            "full_name": user.full_name
-        }
+    # Generate unique user ID
+    import uuid
+    user_id = str(uuid.uuid4())
+    
+    # Create tokens
+    access_token = create_access_token(
+        data={"sub": user.email, "user_id": user_id}
     )
+    refresh_token = create_refresh_token(
+        data={"sub": user.email, "user_id": user_id}
+    )
+    
+    # Return response matching frontend expectations
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user_id,
+            "email": user.email,
+            "name": user.full_name,
+            "phone": user.phone if hasattr(user, 'phone') else None,
+            "created_at": datetime.utcnow().isoformat()
+        }
+    }
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     Login with email and password
     
-    Returns access token and refresh token
+    Returns access token, refresh token, and user data
     """
     # TODO: Verify user credentials from database
     # Mock authentication for now
@@ -121,7 +143,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     password = form_data.password
     
     # Mock user data
-    user_id = "mock-user-id-123"
+    import uuid
+    user_id = str(uuid.uuid4())
     
     # Create tokens
     access_token = create_access_token(
@@ -131,11 +154,18 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         data={"sub": email, "user_id": user_id}
     )
     
-    return Token(
-        access_token=access_token,
-        refresh_token=refresh_token,
-        token_type="bearer"
-    )
+    # Return response matching frontend expectations
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer",
+        "user": {
+            "id": user_id,
+            "email": email,
+            "name": "Rick Jefferson",
+            "created_at": datetime.utcnow().isoformat()
+        }
+    }
 
 
 @router.post("/refresh", response_model=Token)
