@@ -15,10 +15,10 @@ class UserRole(str, Enum):
 
 
 class Address(BaseModel):
-    street: str
-    city: str
-    state: str
-    zip: str
+    street: str = Field(..., min_length=1)
+    city: str = Field(..., min_length=1)
+    state: str = Field(..., min_length=1)
+    zip: str = Field(..., min_length=1)
 
 
 class UserRegister(BaseModel):

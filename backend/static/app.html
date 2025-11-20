@@ -424,24 +424,39 @@
         async function handleSignup(event) {
             event.preventDefault();
             const formData = new FormData(event.target);
+            
+            // Build address object only if all fields are filled
+            const street = formData.get('address')?.trim();
+            const city = formData.get('city')?.trim();
+            const state = formData.get('state')?.trim();
+            const zip = formData.get('zip')?.trim();
+            
             const data = {
                 email: formData.get('email'),
                 password: formData.get('password'),
                 full_name: `${formData.get('first_name')} ${formData.get('last_name')}`,
-                phone: formData.get('phone'),
-                date_of_birth: formData.get('dob'),
-                address: {
-                    street: formData.get('address'),
-                    city: formData.get('city'),
-                    state: formData.get('state'),
-                    zip: formData.get('zip')
-                },
-                ssn_last4: formData.get('ssn_last4')
+                phone: formData.get('phone') || null,
+                date_of_birth: formData.get('dob') || null,
+                ssn_last4: formData.get('ssn_last4') || null
             };
+            
+            // Only include address if all fields are filled
+            if (street && city && state && zip) {
+                data.address = {
+                    street: street,
+                    city: city,
+                    state: state,
+                    zip: zip
+                };
+            }
+            
+            console.log('🚀 Signup data being sent:', JSON.stringify(data, null, 2));
             
             try {
                 // Register user
                 const response = await axios.post('/api/v1/auth/register', data);
+                console.log('✅ Signup successful:', response.data);
+                
                 authToken = response.data.access_token;
                 currentUser = response.data.user;
                 
@@ -458,7 +473,24 @@
                 closeModals();
                 showDashboard();
             } catch (error) {
-                alert('Signup failed: ' + (error.response?.data?.detail || error.message));
+                console.error('❌ Signup error:', error.response?.data);
+                
+                // Show detailed error message
+                let errorMsg = 'Signup failed:\n\n';
+                if (error.response?.data?.detail) {
+                    if (Array.isArray(error.response.data.detail)) {
+                        // Pydantic validation errors
+                        errorMsg += error.response.data.detail.map(err => {
+                            return `• ${err.loc.join(' → ')}: ${err.msg}`;
+                        }).join('\n');
+                    } else {
+                        errorMsg += error.response.data.detail;
+                    }
+                } else {
+                    errorMsg += error.message;
+                }
+                
+                alert(errorMsg);
             }
         }
 
