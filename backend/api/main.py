@@ -128,18 +128,27 @@ static_path = Path(__file__).parent.parent / "static"
 if static_path.exists():
     app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
-# Root Endpoint - Serve chat interface
+# Root Endpoint - Serve full app with auth
 @app.get("/", tags=["System"])
 async def root():
-    """Root endpoint - Chat interface"""
-    chat_file = Path(__file__).parent.parent / "static" / "chat.html"
-    if chat_file.exists():
-        return FileResponse(str(chat_file))
+    """Root endpoint - Full application"""
+    app_file = Path(__file__).parent.parent / "static" / "app.html"
+    if app_file.exists():
+        return FileResponse(str(app_file))
     return {
         "message": "Credit Intelligence Platform API",
         "version": settings.APP_VERSION,
         "docs": f"{settings.API_PREFIX}/docs"
     }
+
+# Chat interface endpoint
+@app.get("/chat", tags=["System"])
+async def chat():
+    """Chat interface page"""
+    chat_file = Path(__file__).parent.parent / "static" / "chat.html"
+    if chat_file.exists():
+        return FileResponse(str(chat_file))
+    return {"message": "Chat page not found"}
 
 # Preview page endpoint
 @app.get("/preview", tags=["System"])
