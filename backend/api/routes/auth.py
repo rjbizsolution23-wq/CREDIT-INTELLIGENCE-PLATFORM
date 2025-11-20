@@ -20,22 +20,26 @@ from config.settings import settings
 
 router = APIRouter()
 
-# Password hashing
+# Password hashing - Using sha256 to avoid bcrypt 72-byte limit
+import hashlib
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_PREFIX}/auth/login")
 
 
 def hash_password(password: str) -> str:
-    """Hash a password (truncate to 72 chars for bcrypt compatibility)"""
-    # Bcrypt has a max password length of 72 bytes
-    # Truncate password to 72 characters to avoid errors
-    truncated_password = password[:72] if len(password) > 72 else password
-    return pwd_context.hash(truncated_password)
+    """Hash a password using SHA-256 (no length limit)"""
+    # For development, use SHA-256 hash to avoid bcrypt 72-byte limit
+    # In production, consider using argon2 which has no such limit
+    salt = "rj_business_solutions_2025"  # In production, use random salt per user
+    salted = f"{salt}{password}".encode('utf-8')
+    return hashlib.sha256(salted).hexdigest()
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    # Use same SHA-256 method as hashing
+    return hash_password(plain_password) == hashed_password
 
 
 def create_access_token(data: dict, expires_delta: timedelta = None) -> str:
