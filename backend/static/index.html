@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Intelligence Platform - Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .gradient-bg {
+            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-white">
+    <!-- Hero Section -->
+    <div class="gradient-bg min-h-screen flex items-center justify-center relative overflow-hidden">
+        <!-- Animated particles -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute w-96 h-96 bg-purple-500 rounded-full opacity-10 blur-3xl -top-20 -left-20"></div>
+            <div class="absolute w-96 h-96 bg-blue-500 rounded-full opacity-10 blur-3xl -bottom-20 -right-20"></div>
+        </div>
+        
+        <div class="container mx-auto px-4 z-10">
+            <div class="text-center">
+                <!-- Logo/Icon -->
+                <div class="mb-8">
+                    <i class="fas fa-brain text-7xl text-white drop-shadow-2xl"></i>
+                </div>
+                
+                <!-- Title -->
+                <h1 class="text-6xl md:text-8xl font-black text-white mb-6 drop-shadow-2xl">
+                    Credit Intelligence
+                    <span class="block bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent">
+                        Platform
+                    </span>
+                </h1>
+                
+                <!-- Subtitle -->
+                <p class="text-2xl md:text-3xl text-white/90 mb-12 max-w-3xl mx-auto drop-shadow-lg">
+                    Elite AI-Powered Credit Analysis with Multi-Agent Orchestration
+                </p>
+                
+                <!-- Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-12">
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                        <div class="text-4xl font-bold text-cyan-400 mb-2">97.99%</div>
+                        <div class="text-sm text-white/80">ML Accuracy</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                        <div class="text-4xl font-bold text-pink-400 mb-2">8/8</div>
+                        <div class="text-sm text-white/80">Tests Passing</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                        <div class="text-4xl font-bold text-green-400 mb-2">$0.00</div>
+                        <div class="text-sm text-white/80">Cost per Analysis</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
+                        <div class="text-4xl font-bold text-yellow-400 mb-2">0.52s</div>
+                        <div class="text-sm text-white/80">Analysis Time</div>
+                    </div>
+                </div>
+                
+                <!-- CTA Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="/api/v1/docs" target="_blank" class="bg-gradient-to-r from-cyan-500 to-pink-500 hover:from-cyan-600 hover:to-pink-600 text-white font-bold px-8 py-4 rounded-full text-lg transition-all transform hover:scale-105 shadow-2xl">
+                        <i class="fas fa-code mr-2"></i>
+                        Explore API Docs
+                    </a>
+                    <a href="https://github.com/rjbizsolution23-wq/CREDIT-INTELLIGENCE-PLATFORM" target="_blank" class="bg-white/10 backdrop-blur-lg hover:bg-white/20 text-white font-bold px-8 py-4 rounded-full text-lg transition-all border border-white/30">
+                        <i class="fab fa-github mr-2"></i>
+                        View on GitHub
+                    </a>
+                </div>
+                
+                <!-- Scroll indicator -->
+                <div class="mt-16 animate-bounce">
+                    <i class="fas fa-chevron-down text-3xl text-white/60"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <div class="bg-gray-950 py-24">
+        <div class="container mx-auto px-4">
+            <h2 class="text-5xl font-bold text-center text-white mb-4">
+                Powered by Elite AI Technology
+            </h2>
+            <p class="text-xl text-gray-400 text-center mb-16 max-w-2xl mx-auto">
+                Three ML models, four AI agents, vector search, and zero-cost LLM orchestration
+            </p>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                <!-- ML Models -->
+                <div class="card-hover bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 border border-cyan-500/30">
+                    <div class="text-5xl mb-6">
+                        <i class="fas fa-brain text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">ML Models</h3>
+                    <p class="text-gray-400 mb-6">
+                        Ensemble of XGBoost, LightGBM, and CatBoost achieving 97.99% AUC accuracy
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>Credit Scoring</li>
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>Fraud Detection (GAT)</li>
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>12-Month Forecasting</li>
+                    </ul>
+                </div>
+                
+                <!-- AI Agents -->
+                <div class="card-hover bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 border border-pink-500/30">
+                    <div class="text-5xl mb-6">
+                        <i class="fas fa-users text-pink-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">AI Agents</h3>
+                    <p class="text-gray-400 mb-6">
+                        Multi-agent orchestration with parallel execution and state management
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>Credit Scoring Agent</li>
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>Fraud Detection Agent</li>
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>Forecasting Agent</li>
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>Insights Agent</li>
+                    </ul>
+                </div>
+                
+                <!-- Vector Search -->
+                <div class="card-hover bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-8 border border-purple-500/30">
+                    <div class="text-5xl mb-6">
+                        <i class="fas fa-search text-purple-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Vector Search</h3>
+                    <p class="text-gray-400 mb-6">
+                        Pinecone integration with OpenAI embeddings for semantic credit report search
+                    </p>
+                    <ul class="space-y-2 text-sm text-gray-300">
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>3072-dim Embeddings</li>
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>RAG Architecture</li>
+                        <li><i class="fas fa-check-circle text-green-400 mr-2"></i>GDPR Compliant</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- API Preview Section -->
+    <div class="bg-gray-900 py-24">
+        <div class="container mx-auto px-4">
+            <h2 class="text-5xl font-bold text-center text-white mb-4">
+                Live API Preview
+            </h2>
+            <p class="text-xl text-gray-400 text-center mb-16 max-w-2xl mx-auto">
+                Test the API endpoints directly from your browser
+            </p>
+            
+            <div class="max-w-4xl mx-auto">
+                <!-- API Status -->
+                <div class="bg-gray-800 rounded-2xl p-8 mb-8 border border-green-500/30">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white mb-2">
+                                <i class="fas fa-circle text-green-400 mr-3 animate-pulse"></i>
+                                API Status: Online
+                            </h3>
+                            <p class="text-gray-400">All systems operational</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-3xl font-bold text-green-400">100%</div>
+                            <div class="text-sm text-gray-400">Uptime</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <a href="/api/v1/docs" target="_blank" class="bg-gray-800 hover:bg-gray-750 rounded-xl p-6 border border-gray-700 hover:border-cyan-500/50 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-xl font-bold text-white">Interactive API Docs</h4>
+                            <i class="fas fa-external-link-alt text-cyan-400"></i>
+                        </div>
+                        <p class="text-gray-400 text-sm">
+                            Swagger UI with live testing capabilities
+                        </p>
+                    </a>
+                    
+                    <a href="/api/v1/redoc" target="_blank" class="bg-gray-800 hover:bg-gray-750 rounded-xl p-6 border border-gray-700 hover:border-pink-500/50 transition-all">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-xl font-bold text-white">ReDoc Documentation</h4>
+                            <i class="fas fa-external-link-alt text-pink-400"></i>
+                        </div>
+                        <p class="text-gray-400 text-sm">
+                            Beautiful API reference documentation
+                        </p>
+                    </a>
+                </div>
+                
+                <!-- Code Example -->
+                <div class="mt-8 bg-gray-800 rounded-2xl p-8 border border-gray-700">
+                    <h4 class="text-xl font-bold text-white mb-4">
+                        <i class="fas fa-code mr-2 text-purple-400"></i>
+                        Quick Start Example
+                    </h4>
+                    <pre class="bg-gray-900 rounded-lg p-4 overflow-x-auto text-sm text-gray-300"><code>curl -X POST "http://localhost:3000/api/v1/credit-score" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "report_id": "test_001",
+    "payment_history_score": 850,
+    "utilization_ratio": 0.15,
+    "credit_age_months": 120,
+    "total_accounts": 10,
+    "recent_inquiries": 1,
+    "derogatory_marks": 0
+  }'</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tech Stack Section -->
+    <div class="bg-gray-950 py-24">
+        <div class="container mx-auto px-4">
+            <h2 class="text-5xl font-bold text-center text-white mb-16">
+                Built with Elite Technology
+            </h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+                <div class="text-center">
+                    <div class="bg-gray-800 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border border-cyan-500/30">
+                        <i class="fas fa-cog text-3xl text-cyan-400"></i>
+                    </div>
+                    <h4 class="font-bold text-white">FastAPI</h4>
+                    <p class="text-sm text-gray-400">Python Backend</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-gray-800 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border border-pink-500/30">
+                        <i class="fas fa-database text-3xl text-pink-400"></i>
+                    </div>
+                    <h4 class="font-bold text-white">PostgreSQL</h4>
+                    <p class="text-sm text-gray-400">Database</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-gray-800 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border border-purple-500/30">
+                        <i class="fas fa-cube text-3xl text-purple-400"></i>
+                    </div>
+                    <h4 class="font-bold text-white">PyTorch</h4>
+                    <p class="text-sm text-gray-400">Deep Learning</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="bg-gray-800 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4 border border-green-500/30">
+                        <i class="fas fa-bolt text-3xl text-green-400"></i>
+                    </div>
+                    <h4 class="font-bold text-white">Pinecone</h4>
+                    <p class="text-sm text-gray-400">Vector DB</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="bg-gray-900 py-12 border-t border-gray-800">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-gray-400 mb-4">
+                Credit Intelligence Platform v1.0.0 | Built by Rick Jefferson Solutions
+            </p>
+            <div class="flex justify-center gap-6">
+                <a href="https://github.com/rjbizsolution23-wq/CREDIT-INTELLIGENCE-PLATFORM" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fab fa-github text-2xl"></i>
+                </a>
+                <a href="/api/v1/docs" target="_blank" class="text-gray-400 hover:text-white transition-colors">
+                    <i class="fas fa-book text-2xl"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

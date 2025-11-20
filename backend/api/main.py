@@ -6,8 +6,9 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 from prometheus_fastapi_instrumentator import Instrumentator
 import logging
 import sys
@@ -122,15 +123,32 @@ async def health_check():
         "environment": settings.ENVIRONMENT
     }
 
-# Root Endpoint
+# Serve static files
+static_path = Path(__file__).parent.parent / "static"
+if static_path.exists():
+    app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+
+# Root Endpoint - Serve chat interface
 @app.get("/", tags=["System"])
 async def root():
-    """Root endpoint"""
+    """Root endpoint - Chat interface"""
+    chat_file = Path(__file__).parent.parent / "static" / "chat.html"
+    if chat_file.exists():
+        return FileResponse(str(chat_file))
     return {
         "message": "Credit Intelligence Platform API",
         "version": settings.APP_VERSION,
         "docs": f"{settings.API_PREFIX}/docs"
     }
+
+# Preview page endpoint
+@app.get("/preview", tags=["System"])
+async def preview():
+    """Preview page with stats"""
+    preview_file = Path(__file__).parent.parent / "static" / "index.html"
+    if preview_file.exists():
+        return FileResponse(str(preview_file))
+    return {"message": "Preview page not found"}
 
 # Include Routers
 app.include_router(auth.router, prefix=f"{settings.API_PREFIX}/auth", tags=["Authentication"])
